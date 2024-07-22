@@ -74,7 +74,7 @@ class Docx extends \ZipArchive
      *
      * @throws \Exception
      */
-    public function replaceTextToImage($text, $path)
+    public function replaceTextToImage($text, $path, $is_signature=false, $distValues=[], $extentValues=[])
     {
         if (! file_exists($path)) {
             throw new \Exception('Image not exists');
@@ -90,8 +90,35 @@ class Docx extends \ZipArchive
 
         $block = $this->getImageBlock($relId, $width, $height);
 
+        //Only for signature thing replace the
+        if($is_signature === true){
+            $block = $this->replaceAttributes($block, $distValues, $extentValues);
+        }
+
         $this->replaceTextToBlock($text, $block);
     }
+
+    function replaceAttributes($xmlBlock, $distValues, $extentValues) {
+        // Replace dist attributes
+        $xmlBlock = preg_replace('/distB="\d+"/', 'distB="' . $distValues['distB'] . '"', $xmlBlock);
+        $xmlBlock = preg_replace('/distT="\d+"/', 'distT="' . $distValues['distT'] . '"', $xmlBlock);
+        $xmlBlock = preg_replace('/distL="\d+"/', 'distL="' . $distValues['distL'] . '"', $xmlBlock);
+        $xmlBlock = preg_replace('/distR="\d+"/', 'distR="' . $distValues['distR'] . '"', $xmlBlock);
+    
+        // Define the regex pattern to match the wp:extent tag with its cx and cy attributes
+        $pattern = '/<wp:extent\s+cx="\d+"\s+cy="\d+"\/>/';
+        
+        // Define the replacement string with the new cx and cy values
+        $replacement = '<wp:extent cx="' . $extentValues['cx'] . '" cy="' . $extentValues['cy'] . '"/>';
+        
+        // Perform the replacement
+        $xmlBlock = preg_replace($pattern, $replacement, $xmlBlock);
+
+        return $xmlBlock;
+    
+    }
+
+    
 
     /**
      * Replace one text to another in $location
@@ -227,4 +254,7 @@ class Docx extends \ZipArchive
 
         return (int) $matches[0];
     }
+
+
+
 }
