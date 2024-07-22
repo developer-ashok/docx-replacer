@@ -1,5 +1,5 @@
 {
-  "name": "irebega/docx-replacer",
+  "name": "coderubix/docx-replacer",
   "description": "PHP extension that allow you replace text to text or text to image in DOCX file",
   "keywords": [
     "php",
