@@ -98,7 +98,7 @@ class Docx extends \ZipArchive
         $this->replaceTextToBlock($text, $block);
     }
 
-    function replaceAttributes($xmlBlock, $distValues, $extentValues) {
+    private function replaceAttributes($xmlBlock, $distValues, $extentValues) {
         // Replace dist attributes
         $xmlBlock = preg_replace('/distB="\d+"/', 'distB="' . $distValues['distB'] . '"', $xmlBlock);
         $xmlBlock = preg_replace('/distT="\d+"/', 'distT="' . $distValues['distT'] . '"', $xmlBlock);
