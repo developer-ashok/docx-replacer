@@ -93,9 +93,10 @@ class Docx extends \ZipArchive
         //Only for signature thing replace the
         if($is_signature === true){
             $block = $this->replaceAttributes($block, $distValues, $extentValues);
+            $this->replaceTextToImageBlock($text, $block);
+        }else{
+            $this->replaceTextToBlock($text, $block);
         }
-
-        $this->replaceTextToBlock($text, $block);
     }
 
     private function replaceAttributes($xmlBlock, $distValues, $extentValues) {
@@ -197,6 +198,24 @@ class Docx extends \ZipArchive
         $pattern = "/<w:r[ >](?:(?!<w:r>|<\/w:r>).)+" . preg_quote($text, '/') . "(?:(?!<w:r>|<\/w:r>).)+<\/w:r>/s";
         $file = preg_replace($pattern, $block, $file);
 
+        $this->addFromString(self::DOCUMENT_BODY_LOCATION, $file);
+        $this->save();
+    }
+
+    private function replaceTextToImageBlock($text, $block)
+    {
+        $file = $this->getFromName(self::DOCUMENT_BODY_LOCATION);
+        
+        $file = $this->getFromName(self::DOCUMENT_BODY_LOCATION);
+        $pattern = '#<w:drawing\b[^>]*>.*?</w:drawing>#s';
+        if (preg_match($pattern, $block, $matches)) {
+            $block = $matches[0];
+        } 
+
+        $pattern = '#<w:t\b[^>]*>' . preg_quote($text, '#') . '</w:t>#';
+        $file = preg_replace($pattern, $block, $file);
+
+  
         $this->addFromString(self::DOCUMENT_BODY_LOCATION, $file);
         $this->save();
     }
